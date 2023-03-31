@@ -187,4 +187,6 @@ int main() {
     const string voterFile = "voters.txt";
 
    
+// Load voter IDs and names from file
 
+vector<pair<string, string>> idNames = loadIdNames(idFile);
