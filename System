@@ -190,3 +190,109 @@ int main() {
 // Load voter IDs and names from file
 
 vector<pair<string, string>> idNames = loadIdNames(idFile);
+// Load candidate names from file
+
+vector<string> candidateNames;
+
+ifstream candidateFile("candidates.txt");
+
+if (!candidateFile) {
+
+    cerr << "Error: Could not open candidates.txt for reading.\n";
+
+    exit(EXIT_FAILURE);
+
+}
+
+string name;
+
+while (getline(candidateFile, name)) {
+
+    candidateNames.push_back(name);
+
+}
+
+candidateFile.close();
+
+// Initialize votes for each candidate to 0
+
+vector<int> votes(candidateNames.size(), 0);
+
+// Prompt user for voter ID and verify it is valid
+
+bool validVoter = false;
+
+string voterId;
+
+while (!validVoter) {
+
+    voterId = maskedInput("Enter your voter ID: ");
+
+    for (const auto& idName : idNames) {
+
+        if (idName.first == voterId) {
+
+            validVoter = true;
+
+            cout << "\nWelcome, " << idName.second << "!\n";
+
+            break;
+
+        }
+
+    }
+
+    if (!validVoter) {
+
+        cout << "\nInvalid voter ID. Please try again.\n";
+
+    }
+
+}
+
+// Check if voter has already voted
+
+if (voterHasVoted(voterId, voteFile)) {
+
+    cout << "Error: You have already voted in this election.\n";
+
+    exit(EXIT_FAILURE);
+
+}
+
+// Prompt user to select a candidate to vote for
+
+int candidateIndex = -1;
+
+while (candidateIndex < 0 || candidateIndex >= candidateNames.size()) {
+
+    cout << "Candidates:\n";
+
+    for (size_t i = 0; i < candidateNames.size(); i++) {
+
+        cout << "  " << i + 1 << ". " << candidateNames[i] << endl;
+
+    }
+
+    cout << "Enter the number of the candidate you would like to vote for: ";
+
+    cin >> candidateIndex;
+
+    candidateIndex--;
+
+}
+
+// Record vote and save voter ID
+
+recordVote(candidateIndex, candidateNames, votes);
+
+saveVoterId(voterId, voteFile);
+
+// Print election results
+
+printResults(candidateNames, votes);
+
+return 0;
+
+
+}
